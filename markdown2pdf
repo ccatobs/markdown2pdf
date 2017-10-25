@@ -1,0 +1,92 @@
+#!/bin/bash
+#
+# Converts CCATp markdown documents to pdf using pandoc.
+#
+set -eu
+
+usage() {
+    echo "Usage: markdown2pdf [OPTION]... INPUT.md [OUTPUT.pdf]"
+}
+
+error() {
+    echo "$@"
+    exit 1
+}
+
+# defaults
+data_dir=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+pandoc_opts=(
+    "--data-dir=$data_dir"
+    "--latex-engine=xelatex"
+    "--standalone"
+    "--variable=fontsize:11pt"
+    "--variable=geometry:margin=1in"
+    "--variable=graphics-path:$data_dir"
+    "--variable=mainfont:DejaVu Serif"
+)
+
+# options
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        --table-of-contents|--toc)
+            pandoc_opts+=("--table-of-contents")
+            shift
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            break
+            ;;
+    esac
+done
+
+case $# in
+    1)
+        md=$1
+        pdf=$(basename "${md%.md}.pdf")
+        ;;
+    2)
+        md=$1
+        pdf=$2
+        ;;
+    *)
+        usage
+        exit 1
+        ;;
+esac
+
+[[ -f $md ]] || error "not a regular file: $md"
+[[ -d $pdf ]] && pdf="$pdf/$(basename "${md%.md}.pdf")"
+
+# colophon
+colophon="pdf created $(date --iso-8601=seconds) by $USER from $(realpath $md)"
+pandoc_opts+=("--variable=colophon:$colophon")
+
+# git info
+wd=$(pwd)
+cd $(dirname "$md")
+if [[ -d .git ]]; then
+    git_desc=$(git describe --all --always --long 2>/dev/null || echo none)
+
+    git_origin=$(git config remote.origin.url || echo none)
+    git_origin=${git_origin#git@}
+    git_origin=${git_origin%.git}
+
+    git_status=$(git status --porcelain "$(basename "$md")" | cut -c-2)
+    case $git_status in
+        '  ') git_status=clean ;;
+        ' M') git_status=dirty ;;
+    esac
+
+    git_info="git origin=$git_origin commit=$git_desc status=$git_status"
+    pandoc_opts+=("--variable=git-info:$git_info")
+fi
+cd "$wd"
+
+pandoc "$md" -o "$pdf" "${pandoc_opts[@]}"

@@ -1,0 +1,39 @@
+% headers/footers
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[C]{$title$}
+\fancyfoot[L]{CCAT\textsl{p}}
+\fancyfoot[C]{$ccatp.doc-id$}
+\fancyfoot[R]{Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\fancypagestyle{titlepage}{
+  \fancyhead{} % no title header on first page
+}
+
+% custom \maketitle with logo
+\usepackage{graphicx}
+\usepackage[export]{adjustbox}
+\graphicspath{{$graphics-path$/}}
+\makeatletter
+\def\maketitle{
+  \includegraphics[width=1in,valign=t]{logos/ccatp-simple-logo-outline}
+  \hfill
+  %\begin{minipage}[t][\dimexpr 1in+\headsep\relax][t]{5.25in}
+  \begin{minipage}[t][1.25in][t]{5.25in}
+    {\large\bfseries\@title}\\\\\textsl{\@author}\\\@date\\\\
+    \begin{minipage}{\linewidth}
+      \tiny\textsf{$colophon$\\$git-info$\\}
+    \end{minipage}
+  \end{minipage}
+  \hrule
+  \bigskip
+  \thispagestyle{titlepage}
+}
+\makeatother
+
+% italic quotes
+\usepackage{etoolbox}
+\AtBeginEnvironment{quote}{\itshape}
