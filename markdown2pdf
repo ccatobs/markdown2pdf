@@ -17,6 +17,7 @@ error() {
 data_dir=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 pandoc_opts=(
     "--data-dir=$data_dir"
+    "--filter=graphviz.py"
     "--latex-engine=xelatex"
     "--standalone"
     "--variable=fontsize:11pt"

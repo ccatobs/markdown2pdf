@@ -19,7 +19,7 @@
 \graphicspath{{$graphics-path$/}}
 \makeatletter
 \def\maketitle{
-  \includegraphics[width=1in,valign=t]{logos/ccatp-simple-logo-outline}
+  \includegraphics[height=1in,width=1in,valign=t]{logos/ccatp-simple-logo-outline}
   \hfill
   %\begin{minipage}[t][\dimexpr 1in+\headsep\relax][t]{5.25in}
   \begin{minipage}[t][1.25in][t]{5.25in}
