@@ -81,8 +81,9 @@ if [[ -d .git ]]; then
 
     git_status=$(git status --porcelain "$(basename "$md")" | cut -c-2)
     case $git_status in
-        '  ') git_status=clean ;;
-        ' M') git_status=dirty ;;
+          '') git_status=ok ;;
+        ' M') git_status=modified ;;
+        '??') git_status=untracked ;;
     esac
 
     git_info="git origin=$git_origin commit=$git_desc status=$git_status"
