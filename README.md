@@ -8,6 +8,8 @@ Usage:
 
 ## Requirements
 
+*Note: these are provided by the ['ccatp-dev' vagrant image](https://github.com/ccatp/os-images).*
+
 On Ubuntu 18.04 LTS, the following packages are required:
 
 ```
