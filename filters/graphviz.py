@@ -10,7 +10,13 @@ def err(msg):
 def graphviz(elem, doc):
     if type(elem) == panflute.CodeBlock and 'dot' in elem.classes:
         name = tempfile.mktemp(suffix='.pdf')
-        args = ['dot', '-Tpdf', '-o', name]
+        args = ['dot',
+                '-Earrowsize=0.6',
+                '-Nfontname=dejavu sans,helvetica',
+                '-Nfontsize=10',
+                '-Nshape=rect',
+                '-Tpdf',
+                '-o', name]
         try:
             dot = subprocess.run(args, input=elem.text.encode('utf8'),
                     stdout=subprocess.DEVNULL)
