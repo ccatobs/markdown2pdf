@@ -13,51 +13,76 @@ def diagrams(elem, doc):
         return
 
     if 'dot' in elem.classes:
-        name = tempfile.mktemp(suffix='.pdf')
+        ofn = tempfile.mktemp(suffix='.pdf')
         args = ['dot',
                 '-Earrowsize=0.6',
                 '-Nfontname=dejavu sans,helvetica',
                 '-Nfontsize=10',
                 '-Nshape=rect',
                 '-Tpdf',
-                '-o', name]
+                '-o', ofn]
         try:
-            dot = subprocess.run(args, input=elem.text.encode('utf8'),
+            dot = subprocess.run(args,
+                    input=elem.text.encode('utf8'),
                     stdout=subprocess.DEVNULL)
-            if dot.returncode == 0:
-                img = panflute.Image(url=name)
-                return panflute.Para(img)
-        except:
+            if dot.returncode != 0:
+                return
+        except Exception as ex:
             err("error running dot")
+            err(ex)
 
     elif 'plantuml' in elem.classes:
-        input = "@startuml\n" + elem.text + "\n@enduml"
+        if '@startuml' in elem.text:
+            extra_args = ['-Smonochrome=true', '-Sshadowing=false']
+        else:
+            extra_args = []
         tmp = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
-        tmp.write(input.encode('utf-8'))
+        tmp.write(elem.text.encode('utf-8'))
         tmp.close()
         ifn = tmp.name
-        ofn = os.path.splitext(ifn)[0] + '.pdf'
+        ifn_without_ext = os.path.splitext(ifn)[0]
+        iofn_svg = ifn_without_ext + '.svg'
+        ofn = ifn_without_ext + '.pdf'
         jarsd = os.path.normpath(os.path.dirname(__file__) + '/../jars')
         args = ['java',
                 '-cp', jarsd + '/*',
                 'net.sourceforge.plantuml.Run',
                 '-charset', 'UTF-8',
-                '-Smonochrome=true',
-                '-Sshadowing=false',
-                '-tpdf',
-                ifn]
+                '-tsvg',
+                ifn] + extra_args
         try:
-            dot = subprocess.run(args,
+            plantuml = subprocess.run(args,
                     stdin=subprocess.DEVNULL,
                     stdout=subprocess.DEVNULL)
-            if dot.returncode == 0:
-                img = panflute.Image(url=ofn)
-                return panflute.Para(img)
+            if plantuml.returncode != 0:
+                return
         except Exception as ex:
             err("error running plantuml")
             err(ex)
         finally:
             os.unlink(ifn)
+
+        # convert svg -> pdf
+        args = ['rsvg-convert',
+                '-f', 'pdf',
+                '-o', ofn,
+                iofn_svg]
+        try:
+            rsvg_convert = subprocess.run(args,
+                    stdin=subprocess.DEVNULL,
+                    stdout=subprocess.DEVNULL)
+            if rsvg_convert.returncode != 0:
+                return
+        except Exception as ex:
+            err("error running rsvg-convert")
+            err(ex)
+        finally:
+            os.unlink(iofn_svg)
+    else:
+        return
+
+    img = panflute.Image(url=ofn)
+    return panflute.Para(img)
 
 def main(doc=None):
     panflute.run_filter(diagrams, doc=doc)
