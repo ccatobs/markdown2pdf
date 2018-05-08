@@ -20,8 +20,9 @@ texlive-xetex
 Optionally, if you want to embed diagrams you'll need:
 
 ```
-default-jdk
+default-jre
 graphviz
+librsvg2-bin
 python3-pip
 ```
 
