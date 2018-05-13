@@ -37,8 +37,12 @@ def diagrams(elem, doc):
         else:
             extra_args = []
         tmp = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
-        tmp.write(elem.text.encode('utf-8'))
+        txt = elem.text.encode('utf-8')
+        if not txt.startswith(b"@start"):
+            txt = b"@startuml\n" + txt + b"\n@enduml\n"             
+        tmp.write(txt)
         tmp.close()
+        #
         ifn = tmp.name
         ifn_without_ext = os.path.splitext(ifn)[0]
         iofn_svg = ifn_without_ext + '.svg'
@@ -50,18 +54,13 @@ def diagrams(elem, doc):
                 '-charset', 'UTF-8',
                 '-tsvg',
                 ifn] + extra_args
-        try:
-            plantuml = subprocess.run(args,
-                    stdin=subprocess.DEVNULL,
-                    stdout=subprocess.DEVNULL)
-            if plantuml.returncode != 0:
-                return
-        except Exception as ex:
-            err("error running plantuml")
-            err(ex)
-        finally:
-            os.unlink(ifn)
-
+        err(" ".join(args))
+        #
+        plantuml = subprocess.check_call(args,
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL)
+        if plantuml != 0:
+            return            
         # convert svg -> pdf
         args = ['rsvg-convert',
                 '-f', 'pdf',
@@ -90,8 +89,8 @@ def main(doc=None):
 if __name__ == '__main__':
     try:
         import panflute
-        main()
     except:
         err("can't import panflute")
         sys.stdout.write(sys.stdin.read())
+    main()        
 
