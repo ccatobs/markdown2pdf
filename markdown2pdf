@@ -15,9 +15,10 @@ error() {
 
 # defaults
 data_dir=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+echo $data_dir
 pandoc_opts=(
     "--data-dir=$data_dir"
-    "--filter=diagrams.py"
+    "--filter=$data_dir/filters/diagrams.py"
     "--latex-engine=xelatex"
     "--standalone"
     "--variable=fontsize:11pt"
@@ -50,7 +51,7 @@ done
 case $# in
     1)
         md=$1
-        pdf=$(basename "${md%.md}.pdf")
+        pdf=$(basename "${md%.md}.pdf")   
         ;;
     2)
         md=$1
@@ -67,6 +68,8 @@ esac
 
 # colophon
 colophon="pdf created $(date --iso-8601=seconds) by $USER from $(realpath $md)"
+colophon=$(sed 's/_/\\_/g' <<< "$colophon")
+
 pandoc_opts+=("--variable=colophon:$colophon")
 
 # git info
@@ -87,6 +90,8 @@ if [[ -d .git ]]; then
     esac
 
     git_info="git origin=$git_origin commit=$git_desc status=$git_status"
+    git_info=$(sed 's/_/\\_/g' <<< "$git_info")
+    echo $git_info
     pandoc_opts+=("--variable=git-info:$git_info")
 fi
 cd "$wd"
