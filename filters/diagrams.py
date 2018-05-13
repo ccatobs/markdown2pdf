@@ -54,7 +54,7 @@ def diagrams(elem, doc):
                 '-charset', 'UTF-8',
                 '-tsvg',
                 ifn] + extra_args
-        err(" ".join(args))
+        #err(" ".join(args))
         #
         plantuml = subprocess.check_call(args,
                 stdin=subprocess.DEVNULL,
