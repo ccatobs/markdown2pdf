@@ -229,7 +229,7 @@ $endif$
   \begin{minipage}[t][1.25in][t]{5.25in}
     {\large\bfseries\@title}\\\\\textsl{\@author}\\\@date\\\\
     \begin{minipage}{\linewidth}
-      \tiny\textsf{$colophon$\\$git-info$\\}
+      \tiny\textsf{\detokenize{$colophon$}\\\detokenize{$git-info$}\\}
     \end{minipage}
   \end{minipage}
   \hrule
