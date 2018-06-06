@@ -10,22 +10,33 @@ def err(msg):
 
 def diagrams(elem, doc):
     if type(elem) != panflute.CodeBlock:
-        return
-
+        return           
     if 'dot' in elem.classes:
-        ofn = tempfile.mktemp(suffix='.pdf')
+        tmp = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
+        txt = elem.text.encode('utf-8')
+        tmp.write(txt)
+        tmp.close()
+        #
+        ifn = tmp.name
+        ifn_without_ext = os.path.splitext(ifn)[0]
+        iofn_svg = ifn_without_ext + '.svg'
+        ofn = ifn_without_ext + '.pdf'
+        if doc.format in ["odt","docx"]:
+            ofn = iofn_svg                
+            export_type = "svg"        
+        else:
+            export_type = "pdf"        
         args = ['dot',
                 '-Earrowsize=0.6',
                 '-Nfontname=dejavu sans,helvetica',
                 '-Nfontsize=10',
                 '-Nshape=rect',
-                '-Tpdf',
-                '-o', ofn]
+                '-T'+export_type, ifn,
+                '-o', ofn]    
         try:
-            dot = subprocess.run(args,
-                    input=elem.text.encode('utf8'),
-                    stdout=subprocess.DEVNULL)
-            if dot.returncode != 0:
+            dot = subprocess.check_call(args)
+            if dot != 0:
+                err("error running dot")
                 return
         except Exception as ex:
             err("error running dot")
@@ -46,41 +57,44 @@ def diagrams(elem, doc):
         ifn = tmp.name
         ifn_without_ext = os.path.splitext(ifn)[0]
         iofn_svg = ifn_without_ext + '.svg'
-        ofn = ifn_without_ext + '.pdf'
+        ofn = ifn_without_ext + '.pdf'        
         jarsd = os.path.normpath(os.path.dirname(__file__) + '/../jars')
         args = ['java',
-                '-cp', jarsd + '/*',
-                'net.sourceforge.plantuml.Run',
+                '-jar', jarsd + '/plantuml.jar',
                 '-charset', 'UTF-8',
                 '-tsvg',
                 ifn] + extra_args
         #err(" ".join(args))
         #
-        plantuml = subprocess.check_call(args,
-                stdin=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL)
+        plantuml = subprocess.check_call(args)
         if plantuml != 0:
             return            
-        # convert svg -> pdf
-        args = ['rsvg-convert',
-                '-f', 'pdf',
-                '-o', ofn,
-                iofn_svg]
-        try:
-            rsvg_convert = subprocess.run(args,
-                    stdin=subprocess.DEVNULL,
-                    stdout=subprocess.DEVNULL)
-            if rsvg_convert.returncode != 0:
-                return
-        except Exception as ex:
-            err("error running rsvg-convert")
-            err(ex)
-        finally:
-            os.unlink(iofn_svg)
+        if doc.format in ["odt","docx"]:
+            ofn = iofn_svg
+        else:
+            # convert svg -> pdf
+            args = ['rsvg-convert',
+                    '-f', 'pdf',
+                    '-o', ofn,
+                    iofn_svg]
+            rsvg_convert = subprocess.check_call(args,
+                        stdin=subprocess.DEVNULL,
+                        stdout=subprocess.DEVNULL)
     else:
-        return
-
-    img = panflute.Image(url=ofn)
+        return  
+    #
+    additional_attributes = []
+    for key,value in elem.attributes.items():
+        if key=='caption':
+            additional_attributes.append(panflute.Str(value))
+        elif key=='cross_ref':
+            #
+            additional_attributes.append(panflute.RawInline("\\label{{{0}}}".format(value), format="latex"))
+    if "caption" in elem.attributes:
+        img = panflute.Image(*additional_attributes,url=ofn, title="fig:")
+    else:
+        img = panflute.Image(url=ofn)
+    
     return panflute.Para(img)
 
 def main(doc=None):
