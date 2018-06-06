@@ -19,6 +19,7 @@ echo $data_dir
 pandoc_opts=(
     "--data-dir=$data_dir"
     "--filter=$data_dir/filters/diagrams.py"
+    "--filter=pandoc-citeproc"
     "--latex-engine=xelatex"
     "--standalone"
     "--variable=fontsize:11pt"
@@ -38,6 +39,7 @@ while [[ $# -gt 0 ]]; do
             pandoc_opts+=("--table-of-contents")
             shift
             ;;
+
         --)
             shift
             break
@@ -52,11 +54,14 @@ case $# in
     1)
         md=$1
         pdf=$(basename "${md%.md}.pdf")   
+        odt=$(basename "${md%.md}.odt")        
+        docx=$(basename "${md%.md}.docx")         
         ;;
     2)
         md=$1
         pdf=$2
         ;;
+
     *)
         usage
         exit 1
@@ -96,4 +101,11 @@ if [[ -d .git ]]; then
 fi
 cd "$wd"
 
+if [ -f bibliography.bib ]; then
+pandoc --bibliography=bibliography.bib "$md" -o "$pdf" "${pandoc_opts[@]}"
+#pandoc --bibliography=bibliography.bib "$md" -o "$odt" "${pandoc_opts[@]}"
+#pandoc --bibliography=bibliography.bib "$md" -o "$docx" "${pandoc_opts[@]}"
+#pandoc --bibliography=bibliography.bib "$md" --to latex "${pandoc_opts[@]}"
+else
 pandoc "$md" -o "$pdf" "${pandoc_opts[@]}"
+fi
