@@ -12,7 +12,12 @@ def diagrams(elem, doc):
     if type(elem) != panflute.CodeBlock:
         return           
     if 'dot' in elem.classes:
-        tmp = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
+        if "filename" in elem.attributes:
+            if not os.path.exists(os.path.dirname(elem.attributes["filename"])):
+                os.makedirs(os.path.dirname(elem.attributes["filename"]))        
+            tmp = open(elem.attributes["filename"],'wb')
+        else:
+            tmp = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
         txt = elem.text.encode('utf-8')
         tmp.write(txt)
         tmp.close()
@@ -47,7 +52,12 @@ def diagrams(elem, doc):
             extra_args = ['-Smonochrome=true', '-Sshadowing=false']
         else:
             extra_args = []
-        tmp = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
+        if "filename" in elem.attributes:
+            if not os.path.exists(os.path.dirname(elem.attributes["filename"])):
+                os.makedirs(os.path.dirname(elem.attributes["filename"]))
+            tmp = open(elem.attributes["filename"],'wb')
+        else:
+            tmp = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
         txt = elem.text.encode('utf-8')
         if not txt.startswith(b"@start"):
             txt = b"@startuml\n" + txt + b"\n@enduml\n"             
