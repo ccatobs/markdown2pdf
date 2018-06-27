@@ -4,7 +4,7 @@
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[C]{$title$}
-\fancyfoot[L]{CCAT\textsl{p}}
+\fancyfoot[L]{CCAT-\textsl{prime}}
 \fancyfoot[C]{$ccatp.doc-id$}
 \fancyfoot[R]{Page \thepage\ of \pageref{LastPage}}
 \renewcommand{\headrulewidth}{0.4pt}
