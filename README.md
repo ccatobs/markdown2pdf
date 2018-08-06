@@ -15,6 +15,7 @@ On Ubuntu 18.04 LTS, the following packages are required:
 ```
 pandoc
 texlive-xetex
+pandoc-citeproc
 ```
 
 Optionally, if you want to embed diagrams you'll need:
@@ -30,4 +31,5 @@ and then run the command `$ pip3 install panflute`.
 
 For [PlantUML](https://plantuml.com) diagrams, you'll need to download
 the jar file and put it in the `jars/` subdirectory.
+
 
