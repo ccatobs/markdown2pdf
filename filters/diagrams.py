@@ -10,11 +10,11 @@ def err(msg):
 
 def diagrams(elem, doc):
     if type(elem) != panflute.CodeBlock:
-        return           
+        return
     if 'dot' in elem.classes:
         if "filename" in elem.attributes:
             if not os.path.exists(os.path.dirname(elem.attributes["filename"])):
-                os.makedirs(os.path.dirname(elem.attributes["filename"]))        
+                os.makedirs(os.path.dirname(elem.attributes["filename"]))
             tmp = open(elem.attributes["filename"],'wb')
         else:
             tmp = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
@@ -27,17 +27,17 @@ def diagrams(elem, doc):
         iofn_svg = ifn_without_ext + '.svg'
         ofn = ifn_without_ext + '.pdf'
         if doc.format in ["odt","docx"]:
-            ofn = iofn_svg                
-            export_type = "svg"        
+            ofn = iofn_svg
+            export_type = "svg"
         else:
-            export_type = "pdf"        
+            export_type = "pdf"
         args = ['dot',
                 '-Earrowsize=0.6',
                 '-Nfontname=dejavu sans,helvetica',
                 '-Nfontsize=10',
                 '-Nshape=rect',
                 '-T'+export_type, ifn,
-                '-o', ofn]    
+                '-o', ofn]
         try:
             dot = subprocess.check_call(args)
             if dot != 0:
@@ -60,14 +60,14 @@ def diagrams(elem, doc):
             tmp = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
         txt = elem.text.encode('utf-8')
         if not txt.startswith(b"@start"):
-            txt = b"@startuml\n" + txt + b"\n@enduml\n"             
+            txt = b"@startuml\n" + txt + b"\n@enduml\n"
         tmp.write(txt)
         tmp.close()
         #
         ifn = tmp.name
         ifn_without_ext = os.path.splitext(ifn)[0]
         iofn_svg = ifn_without_ext + '.svg'
-        ofn = ifn_without_ext + '.pdf'        
+        ofn = ifn_without_ext + '.pdf'
         jarsd = os.path.normpath(os.path.dirname(__file__) + '/../jars')
         args = ['java',
                 '-jar', jarsd + '/plantuml.jar',
@@ -78,7 +78,7 @@ def diagrams(elem, doc):
         #
         plantuml = subprocess.check_call(args)
         if plantuml != 0:
-            return            
+            return
         if doc.format in ["odt","docx"]:
             ofn = iofn_svg
         else:
@@ -91,7 +91,7 @@ def diagrams(elem, doc):
                         stdin=subprocess.DEVNULL,
                         stdout=subprocess.DEVNULL)
     else:
-        return  
+        return
     #
     additional_attributes = []
     for key,value in elem.attributes.items():
@@ -104,7 +104,7 @@ def diagrams(elem, doc):
         img = panflute.Image(*additional_attributes,url=ofn, title="fig:")
     else:
         img = panflute.Image(url=ofn)
-    
+
     return panflute.Para(img)
 
 def main(doc=None):
@@ -117,4 +117,3 @@ if __name__ == '__main__':
         err("can't import panflute")
         sys.stdout.write(sys.stdin.read())
     main()        
-
