@@ -32,4 +32,11 @@ and then run the command `$ pip3 install panflute`.
 For [PlantUML](https://plantuml.com) diagrams, you'll need to download
 the jar file and put it in the `jars/` subdirectory.
 
+For [latex support](http://plantuml.com/ascii-math) in plantuml you should add the following jars to your 
+ext 
+```
+jlatexmath-1.0.3.jar
+batik-all-1.10.jar
+```
+
 
