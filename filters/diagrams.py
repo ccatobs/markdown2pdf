@@ -58,6 +58,12 @@ def diagrams(elem, doc):
             tmp = open(elem.attributes["filename"],'wb')
         else:
             tmp = tempfile.NamedTemporaryFile(suffix=".txt", delete=False)
+        #
+        for attr in elem.attributes:
+            # skin parameters (http://plantuml.com/skinparam) can be set from attributes
+            # for example Smonochrome=false
+            if attr[0]=="S":
+                extra_args.append("-{0}={1}".format(attr,elem.attributes[attr]))
         txt = elem.text.encode('utf-8')
         if not txt.startswith(b"@start"):
             txt = b"@startuml\n" + txt + b"\n@enduml\n"
