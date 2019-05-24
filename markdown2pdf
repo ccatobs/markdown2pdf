@@ -54,8 +54,6 @@ case $# in
     1)
         md=$1
         pdf=$(basename "${md%.md}.pdf")   
-        odt=$(basename "${md%.md}.odt")        
-        docx=$(basename "${md%.md}.docx")         
         ;;
     2)
         md=$1
@@ -101,11 +99,8 @@ if [[ -d .git ]]; then
 fi
 cd "$wd"
 
-if [ -f bibliography.bib ]; then
-pandoc --bibliography=bibliography.bib "$md" -o "$pdf" "${pandoc_opts[@]}"
-#pandoc --bibliography=bibliography.bib "$md" -o "$odt" "${pandoc_opts[@]}"
-#pandoc --bibliography=bibliography.bib "$md" -o "$docx" "${pandoc_opts[@]}"
-#pandoc --bibliography=bibliography.bib "$md" --to latex "${pandoc_opts[@]}"
-else
-pandoc "$md" -o "$pdf" "${pandoc_opts[@]}"
+if [[ -f bibliography.bib ]]; then
+    pandoc_opts+=("--bibliography=bibliography.bib")
 fi
+
+pandoc "$md" -o "$pdf" "${pandoc_opts[@]}"
