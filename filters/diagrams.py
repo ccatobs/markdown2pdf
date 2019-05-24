@@ -33,7 +33,11 @@ def diagrams(elem, doc):
             export_type = "pdf"
         args = ['dot',
                 '-Earrowsize=0.6',
+                '-Efontname=dejavu sans,helvetica',
+                '-Gfontname=dejavu sans,helvetica',
                 '-Nfontname=dejavu sans,helvetica',
+                '-Efontsize=9',
+                '-Gfontsize=11',
                 '-Nfontsize=10',
                 '-Nshape=rect',
                 '-T'+export_type, ifn,
