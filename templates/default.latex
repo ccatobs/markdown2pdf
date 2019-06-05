@@ -214,25 +214,41 @@ $endif$
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 \fancypagestyle{titlepage}{
-  \fancyhead{} % no title header on first page
+  \fancyhead[C]{$ccatp.doc-id$} % nobody looks at the bottom of the page
 }
 
 % custom \maketitle with logo
 \usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage[table]{xcolor}
 \usepackage[export]{adjustbox}
 \graphicspath{{$graphics-path$/}}
 \makeatletter
 \def\maketitle{
   \includegraphics[height=1in,width=1in,valign=t]{logos/ccatp-simple-logo-outline}
   \hfill
-  %\begin{minipage}[t][\dimexpr 1in+\headsep\relax][t]{5.25in}
   \begin{minipage}[t][1.25in][t]{5.25in}
     {\large\bfseries\@title}\\\\\textsl{\@author}\\\@date\\\\
     \begin{minipage}{\linewidth}
       \tiny\textsf{\detokenize{$colophon$}\\\detokenize{$git-info$}\\}
     \end{minipage}
   \end{minipage}
+  $if(ccatp.revisions)$
+  {\footnotesize
+  \begin{tabularx}{\textwidth}{|c|c|X|}
+    \hline\rowcolor[gray]{0.9}
+    \textbf{Version} & \textbf{Approved} & \textbf{Notes} \\
+    \hline
+    $for(ccatp.revisions)$
+    \detokenize{$ccatp.revisions.version$} &
+    \detokenize{$ccatp.revisions.approved-by$, $ccatp.revisions.approved-on$} &
+    \detokenize{$ccatp.revisions.note$} \\
+    \hline
+    $endfor$
+  \end{tabularx}}
+  $else$
   \hrule
+  $endif$
   \bigskip
   \thispagestyle{titlepage}
 }
