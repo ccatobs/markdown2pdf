@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Converts CCATp markdown documents to pdf using pandoc.
+# Converts FYST markdown documents to pdf using pandoc.
 #
 set -eu
 
